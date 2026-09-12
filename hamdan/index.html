@@ -6,28 +6,112 @@
   <title>Undangan Pernikahan</title>
   <link id="theme-style" rel="stylesheet" href="">
 </head>
-<body>
+<body class="locked">
 
-  <div class="card">
+  <!-- Audio Background -->
+  <audio id="bg-music" loop></audio>
+
+  <!-- Cover / Header Halaman Depan -->
+  <div id="cover" class="cover-screen">
     <p>Undangan Pernikahan</p>
-    <h1 id="bride-groom">Memuat...</h1>
-    
-    <hr style="border: 0.5px solid #eee; margin: 20px 0;">
+    <h1 id="cover-couples">Romeo & Juliet</h1>
+    <p style="margin-top: 15px;">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+    <h3 id="guest-name" style="color: var(--accent); margin-bottom: 20px;">Nama Tamu</h3>
+    <button class="btn" onclick="bukaUndangan()">✉️ Buka Undangan</button>
+  </div>
 
-    <p>Kepada Yth. Bapak/Ibu/Saudara/i:</p>
-    <h2 id="guest-name" style="color: #2c3e50;">Nama Tamu</h2>
+  <div class="container">
+    <!-- Section Kutipan & Pembuka -->
+    <section>
+      <h3 id="salam-text">Salam</h3>
+      <p id="quote-text" style="font-style: italic; margin-top: 10px;"></p>
+      <small id="quote-source" style="color: var(--text-muted);"></small>
+    </section>
 
-    <div style="margin-top: 30px;">
-      <h3>Akad Nikah</h3>
-      <p id="akad-date">-</p>
-      <a id="akad-maps" href="#" target="_blank" class="btn">Google Maps Akad</a>
-    </div>
+    <!-- Section Profil Pengantin -->
+    <section>
+      <h2>Mempelai</h2>
+      <div style="margin-bottom: 25px;">
+        <img id="pria-foto" class="profile-img" src="" alt="Pria">
+        <h3 id="pria-lengkap"></h3>
+        <p id="pria-ortu" style="font-size: 0.85rem; color: var(--text-muted);"></p>
+        <a id="pria-ig" href="#" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 5px 12px;">Instagram</a>
+      </div>
+      <h2 style="border: none; color: var(--accent);">&</h2>
+      <div>
+        <img id="wanita-foto" class="profile-img" src="" alt="Wanita">
+        <h3 id="wanita-lengkap"></h3>
+        <p id="wanita-ortu" style="font-size: 0.85rem; color: var(--text-muted);"></p>
+        <a id="wanita-ig" href="#" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 5px 12px;">Instagram</a>
+      </div>
+    </section>
 
-    <div style="margin-top: 25px;">
-      <h3>Resepsi</h3>
-      <p id="resepsi-date">-</p>
-      <a id="resepsi-maps" href="#" target="_blank" class="btn">Google Maps Resepsi</a>
-    </div>
+    <!-- Section Detail Acara -->
+    <section>
+      <h2>Waktu & Lokasi</h2>
+      <div style="margin-bottom: 20px;">
+        <h3>Akad Nikah</h3>
+        <p id="akad-tgl"></p>
+        <p id="akad-jam"></p>
+        <p id="akad-lokasi" style="font-weight: bold;"></p>
+        <a id="akad-maps" href="#" target="_blank" class="btn">Petunjuk Lokasi (Akad)</a>
+      </div>
+      <hr style="border: 0.5px solid var(--border); margin: 20px 0;">
+      <div>
+        <h3>Resepsi</h3>
+        <p id="resepsi-tgl"></p>
+        <p id="resepsi-jam"></p>
+        <p id="resepsi-lokasi" style="font-weight: bold;"></p>
+        <a id="resepsi-maps" href="#" target="_blank" class="btn">Petunjuk Lokasi (Resepsi)</a>
+      </div>
+      <br>
+      <a id="save-calendar" href="#" target="_blank" class="btn btn-outline">📅 Simpan ke Kalender</a>
+    </section>
+
+    <!-- Section Galeri & Video -->
+    <section>
+      <h2>Galeri Foto</h2>
+      <div id="gallery-container" class="gallery-grid"></div>
+      <div style="margin-top: 20px;">
+        <iframe id="video-frame" width="100%" height="220" style="border:none; border-radius:8px;" src=""></iframe>
+      </div>
+    </section>
+
+    <!-- Section Love Story -->
+    <section>
+      <h2>Cerita Kita</h2>
+      <div id="story-container"></div>
+    </section>
+
+    <!-- Section Digital Gift -->
+    <section>
+      <h2>Digital Gift</h2>
+      <p style="font-size: 0.9rem; margin-bottom: 15px;">Doa restu Anda merupakan hadiah terindah bagi kami. Namun jika ingin memberi hadiah, dapat melalui:</p>
+      <div id="rekening-container"></div>
+    </section>
+
+    <!-- Section RSVP & Ucapan -->
+    <section>
+      <h2>RSVP & Ucapan</h2>
+      <form id="rsvp-form" onsubmit="kirimRSVP(event)">
+        <input type="text" id="rsvp-nama" placeholder="Nama Anda" required>
+        <select id="rsvp-status">
+          <option value="Hadir">Hadir</option>
+          <option value="Tidak Hadir">Tidak Hadir</option>
+        </select>
+        <input type="number" id="rsvp-jumlah" placeholder="Jumlah Tamu" min="1" value="1">
+        <textarea id="rsvp-pesan" rows="3" placeholder="Berikan Ucapan & Doa..." required></textarea>
+        <button type="submit" class="btn">Kirim via WhatsApp</button>
+      </form>
+    </section>
+
+    <!-- Section Penutup -->
+    <section>
+      <p>Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.</p>
+      <br>
+      <p>Terima Kasih,</p>
+      <h3 id="penutup-couples" style="margin-top: 10px;">Romeo & Juliet</h3>
+    </section>
   </div>
 
   <script src="../assets/js/app.js"></script>
