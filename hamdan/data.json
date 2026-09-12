@@ -1,0 +1,19 @@
+{
+  "theme": "rustic",
+  "pria": "Romeo",
+  "wanita": "Juliet",
+  "ig_pria": "romeo_ig",
+  "ig_wanita": "juliet_ig",
+  "akad": {
+    "tanggal": "Sabtu, 24 Oktober 2026",
+    "jam": "08.00 WIB",
+    "lokasi": "Masjid Agung",
+    "maps": "https://maps.google.com"
+  },
+  "resepsi": {
+    "tanggal": "Sabtu, 24 Oktober 2026",
+    "jam": "11.00 WIB",
+    "lokasi": "Grand Ballroom",
+    "maps": "https://maps.google.com"
+  }
+}
