@@ -1,7 +1,7 @@
 const DATA_UNDANGAN = {
   foto_cover: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
   foto_hero: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800",
-  audio_file: "../assets/audio/001.ogg", // Atau URL mp3 online
+  audio_file: "../assets/audio/001.ogg",
   
   pria: {
     nama_panggilan: "Romeo",
