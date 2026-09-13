@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Undangan Pernikahan</title>
+  <style>
+    :root {
+      --bg-color: #fdfbf7;
+      --card-bg: #ffffff;
+      --primary: #8c6d58;
+      --primary-dark: #6e523f;
+      --accent: #d4a373;
+      --accent-light: #faedcd;
+      --text-dark: #3d342e;
+      --text-muted: #8d8178;
+      --border: #f0eae1;
+      --shadow: 0 10px 30px rgba(140, 109, 88, 0.08);
+      --bg-cover: none;
+      --bg-hero: none;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #e5dfd5;
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    body.locked { overflow: hidden; }
+
+    .mobile-wrapper {
+      max-width: 480px; margin: 0 auto;
+      background-color: var(--bg-color);
+      min-height: 100vh; position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.15);
+      overflow-x: hidden;
+    }
+
+    .cover-screen {
+      position: fixed; top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%; max-width: 480px; height: 100vh;
+      background: linear-gradient(to bottom, rgba(45, 36, 30, 0.4), rgba(45, 36, 30, 0.75)), var(--bg-cover) center/cover no-repeat;
+      color: #fff; display: flex; flex-direction: column;
+      justify-content: space-between; align-items: center;
+      z-index: 999; padding: 60px 24px; text-align: center;
+      transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+    .cover-screen.opened { transform: translate(-50%, -100%); }
+
+    .cover-header p { letter-spacing: 3px; font-size: 0.85rem; text-transform: uppercase; color: var(--accent-light); }
+    .cover-title { font-family: Georgia, serif; font-size: 2.5rem; font-weight: normal; margin: 10px 0; }
+    .cover-footer { width: 100%; }
+    .guest-box { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2); }
+
+    .btn {
+      display: inline-block; width: 100%;
+      background: var(--primary); color: #fff;
+      padding: 14px 20px; border-radius: 30px;
+      text-decoration: none; font-weight: 600; font-size: 0.95rem;
+      border: none; cursor: pointer; text-align: center;
+      transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(140, 109, 88, 0.2);
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); box-shadow: none; }
+
+    section { padding: 45px 24px; text-align: center; }
+    .card-section { background: var(--card-bg); border-radius: 20px; padding: 30px 20px; margin: 0 20px 30px 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+
+    .hero-sec {
+      min-height: 90vh;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), var(--bg-hero) center/cover no-repeat;
+      color: #fff; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px 24px;
+    }
+    .hero-title { font-family: Georgia, serif; font-size: 2.4rem; }
+
+    .countdown-box { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+    .count-item { background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); padding: 8px 12px; border-radius: 10px; min-width: 60px; }
+    .count-num { font-size: 1.3rem; font-weight: bold; display: block; }
+    .count-label { font-size: 0.7rem; text-transform: uppercase; }
+
+    .profile-img { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: var(--shadow); margin-bottom: 15px; }
+
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
+    .gallery-grid img { width: 100%; height: 150px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: transform 0.3s; }
+
+    .lightbox-modal {
+      display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9); justify-content: center; align-items: center;
+    }
+    .lightbox-modal img { max-width: 90%; max-height: 80%; border-radius: 10px; }
+
+    input, select, textarea { width: 100%; padding: 12px 15px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; font-size: 0.9rem; }
+
+    .fade-up { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body class="locked">
+
+  <audio id="bg-music" loop></audio>
+
+  <div class="mobile-wrapper">
+    
+    <!-- Cover -->
+    <div id="cover" class="cover-screen">
+      <div class="cover-header">
+        <p>The Wedding of</p>
+        <h1 id="cover-couples" class="cover-title"></h1>
+        <p id="cover-date" style="font-size: 0.9rem; color: #fff;"></p>
+      </div>
+
+      <div class="cover-footer">
+        <div class="guest-box">
+          <p style="font-size: 0.8rem; margin-bottom: 5px;">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+          <h3 id="guest-name" style="font-size: 1.1rem; color: var(--accent-light);">Nama Tamu</h3>
+        </div>
+        <button class="btn" onclick="bukaUndangan()">✉️ Buka Undangan</button>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero-sec">
+      <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;">We Are Getting Married</p>
+      <h1 id="hero-couples" class="hero-title"></h1>
+      <p id="hero-date" style="font-size: 0.95rem; opacity: 0.9;"></p>
+      
+      <div class="countdown-box">
+        <div class="count-item"><span id="cd-days" class="count-num">0</span><span class="count-label">Hari</span></div>
+        <div class="count-item"><span id="cd-hours" class="count-num">0</span><span class="count-label">Jam</span></div>
+        <div class="count-item"><span id="cd-mins" class="count-num">0</span><span class="count-label">Menit</span></div>
+        <div class="count-item"><span id="cd-secs" class="count-num">0</span><span class="count-label">Detik</span></div>
+      </div>
+    </div>
+
+    <!-- Quote -->
+    <section class="fade-up">
+      <h3 id="quote-salam" style="color: var(--primary); font-size: 1.1rem; margin-bottom: 10px;"></h3>
+      <p id="quote-teks" style="font-style: italic; font-size: 0.9rem; color: var(--text-muted);"></p>
+      <small id="quote-sumber" style="font-weight: bold; color: var(--primary); display: block; margin-top: 8px;"></small>
+    </section>
+
+    <!-- Mempelai -->
+    <section class="card-section fade-up">
+      <h2 style="color: var(--primary); font-family: Georgia, serif; font-size: 1.5rem; margin-bottom: 25px;">Mempelai</h2>
+      <div style="margin-bottom: 30px;">
+        <img id="pria-foto" class="profile-img" src="" alt="Pria">
+        <h3 id="pria-lengkap" style="font-size: 1.2rem;"></h3>
+        <p id="pria-ortu" style="font-size: 0.8rem; color: var(--text-muted); margin: 5px 0 10px 0;"></p>
+        <a id="pria-ig" href="#" target="_blank" class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem; width: auto;">Instagram</a>
+      </div>
+      <div style="font-family: Georgia, serif; font-size: 1.8rem; color: var(--accent); margin: 15px 0;">&</div>
+      <div>
+        <img id="wanita-foto" class="profile-img" src="" alt="Wanita">
+        <h3 id="wanita-lengkap" style="font-size: 1.2rem;"></h3>
+        <p id="wanita-ortu" style="font-size: 0.8rem; color: var(--text-muted); margin: 5px 0 10px 0;"></p>
+        <a id="wanita-ig" href="#" target="_blank" class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem; width: auto;">Instagram</a>
+      </div>
+    </section>
+
+    <!-- Acara -->
+    <section class="card-section fade-up">
+      <h2 style="color: var(--primary); font-family: Georgia, serif; font-size: 1.5rem; margin-bottom: 25px;">Waktu & Lokasi</h2>
+      <div style="margin-bottom: 25px;">
+        <h3 style="color: var(--accent);">Akad Nikah</h3>
+        <p id="akad-tgl" style="font-weight: 600; font-size: 0.9rem; margin-top: 5px;"></p>
+        <p id="akad-jam" style="font-size: 0.85rem; color: var(--text-muted);"></p>
+        <p id="akad-lokasi" style="font-size: 0.85rem; margin: 5px 0 12px 0;"></p>
+        <a id="akad-maps" href="#" target="_blank" class="btn btn-outline" style="font-size: 0.85rem;">Petunjuk Lokasi Akad</a>
+      </div>
+      <hr style="border: 0.5px solid var(--border); margin: 20px 0;">
+      <div style="margin-bottom: 25px;">
+        <h3 style="color: var(--accent);">Resepsi</h3>
+        <p id="resepsi-tgl" style="font-weight: 600; font-size: 0.9rem; margin-top: 5px;"></p>
+        <p id="resepsi-jam" style="font-size: 0.85rem; color: var(--text-muted);"></p>
+        <p id="resepsi-lokasi" style="font-size: 0.85rem; margin: 5px 0 12px 0;"></p>
+        <a id="resepsi-maps" href="#" target="_blank" class="btn btn-outline" style="font-size: 0.85rem;">Petunjuk Lokasi Resepsi</a>
+      </div>
+      <a id="save-calendar" href="#" target="_blank" class="btn">📅 Simpan ke Kalender</a>
+    </section>
+
+    <!-- Galeri -->
+    <section class="fade-up">
+      <h2 style="color: var(--primary); font-family: Georgia, serif; font-size: 1.5rem;">Galeri Bahagia</h2>
+      <div id="gallery-container" class="gallery-grid"></div>
+      <div style="margin-top: 20px;">
+        <iframe id="video-frame" width="100%" height="210" style="border:none; border-radius:12px;" src=""></iframe>
+      </div>
+    </section>
+
+    <!-- Digital Gift -->
+    <section class="card-section fade-up">
+      <h2 style="color: var(--primary); font-family: Georgia, serif; font-size: 1.5rem;">Digital Gift</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 10px 0 20px 0;">Doa restu Anda merupakan hadiah terindah bagi kami. Namun jika ingin memberi tanda kasih, dapat melalui:</p>
+      <div id="rekening-container"></div>
+    </section>
+
+    <!-- RSVP -->
+    <section class="card-section fade-up">
+      <h2 style="color: var(--primary); font-family: Georgia, serif; font-size: 1.5rem; margin-bottom: 15px;">RSVP & Ucapan</h2>
+      <form id="rsvp-form" onsubmit="kirimRSVP(event)">
+        <input type="text" id="rsvp-nama" placeholder="Nama Anda" required>
+        <select id="rsvp-status">
+          <option value="Hadir">Saya Akan Hadir</option>
+          <option value="Tidak Hadir">Maaf, Tidak Bisa Hadir</option>
+        </select>
+        <input type="number" id="rsvp-jumlah" placeholder="Jumlah Tamu (Orang)" min="1" value="1">
+        <textarea id="rsvp-pesan" rows="3" placeholder="Berikan Ucapan & Doa Restu..." required></textarea>
+        <button type="submit" class="btn">Kirim via WhatsApp</button>
+      </form>
+    </section>
+
+    <!-- Penutup -->
+    <section class="fade-up" style="padding-bottom: 60px;">
+      <p style="font-size: 0.9rem; color: var(--text-muted);">Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.</p>
+      <p style="margin-top: 25px; font-size: 0.9rem;">Kami yang berbahagia,</p>
+      <h2 id="penutup-couples" style="font-family: Georgia, serif; color: var(--primary); margin-top: 5px;"></h2>
+    </section>
+
+  </div>
+
+  <div id="lightbox" class="lightbox-modal" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Zoom Foto">
+  </div>
+
+  <!-- Panggil file data.js lokal -->
+  <script src="./data.js"></script>
+
+  <!-- Script Penampil Data -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // 1. Tangkap Parameter Nama Tamu dari Link (?to=Nama+Tamu)
+      const urlParams = new URLSearchParams(window.location.search);
+      const guestName = urlParams.get('to');
+      if (guestName) {
+        document.getElementById('guest-name').textContent = guestName;
+        document.getElementById('rsvp-nama').value = guestName;
+      }
+
+      // 2. Load Data langsung dari variabel DATA_UNDANGAN di data.js
+      if (typeof DATA_UNDANGAN !== 'undefined') {
+        const data = DATA_UNDANGAN;
+
+        document.documentElement.style.setProperty('--bg-cover', `url('${data.foto_cover}')`);
+        document.documentElement.style.setProperty('--bg-hero', `url('${data.foto_hero}')`);
+        document.getElementById('bg-music').src = data.audio_file;
+
+        const namaPasangan = `${data.pria.nama_panggilan} & ${data.wanita.nama_panggilan}`;
+        document.getElementById('cover-couples').textContent = namaPasangan;
+        document.getElementById('hero-couples').textContent = namaPasangan;
+        document.getElementById('penutup-couples').textContent = namaPasangan;
+        document.getElementById('cover-date').textContent = data.resepsi.tanggal;
+        document.getElementById('hero-date').textContent = data.resepsi.tanggal;
+
+        document.getElementById('quote-salam').textContent = data.quote.salam;
+        document.getElementById('quote-teks').textContent = `"${data.quote.teks}"`;
+        document.getElementById('quote-sumber').textContent = data.quote.sumber;
+
+        document.getElementById('pria-foto').src = data.pria.foto;
+        document.getElementById('pria-lengkap').textContent = data.pria.nama_lengkap;
+        document.getElementById('pria-ortu').textContent = data.pria.orang_tua;
+        document.getElementById('pria-ig').href = data.pria.instagram;
+
+        document.getElementById('wanita-foto').src = data.wanita.foto;
+        document.getElementById('wanita-lengkap').textContent = data.wanita.nama_lengkap;
+        document.getElementById('wanita-ortu').textContent = data.wanita.orang_tua;
+        document.getElementById('wanita-ig').href = data.wanita.instagram;
+
+        document.getElementById('akad-tgl').textContent = data.akad.tanggal;
+        document.getElementById('akad-jam').textContent = data.akad.jam;
+        document.getElementById('akad-lokasi').textContent = data.akad.lokasi;
+        document.getElementById('akad-maps').href = data.akad.maps;
+
+        document.getElementById('resepsi-tgl').textContent = data.resepsi.tanggal;
+        document.getElementById('resepsi-jam').textContent = data.resepsi.jam;
+        document.getElementById('resepsi-lokasi').textContent = data.resepsi.lokasi;
+        document.getElementById('resepsi-maps').href = data.resepsi.maps;
+
+        document.getElementById('save-calendar').href = data.save_the_date_url;
+
+        const galleryBox = document.getElementById('gallery-container');
+        data.galeri.forEach(src => {
+          const img = document.createElement('img');
+          img.src = src;
+          img.onclick = () => openLightbox(src);
+          galleryBox.appendChild(img);
+        });
+        document.getElementById('video-frame').src = data.video_embed;
+
+        const rekBox = document.getElementById('rekening-container');
+        data.rekening.forEach(rek => {
+          const div = document.createElement('div');
+          div.style.cssText = "background: var(--bg-color); padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 0.85rem;";
+          div.innerHTML = `
+            <strong>${rek.bank}</strong> - ${rek.nomor}<br>
+            <span style="color:var(--text-muted)">a.n ${rek.pemilik}</span><br>
+            <button class="btn btn-outline" style="font-size: 0.75rem; padding: 4px 12px; margin-top: 8px; width:auto;" onclick="navigator.clipboard.writeText('${rek.nomor}'); alert('Nomor rekening disalin!')">Salin Rekening</button>
+          `;
+          rekBox.appendChild(div);
+        });
+
+        startCountdown(data.resepsi.tanggal_iso);
+      }
+
+      // Animasi Fade In Scroll
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    });
+
+    function bukaUndangan() {
+      document.getElementById('cover').classList.add('opened');
+      document.body.classList.remove('locked');
+      const music = document.getElementById('bg-music');
+      music.play().catch(() => console.log("Audio play blocked"));
+    }
+
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    function startCountdown(targetISO) {
+      const targetDate = new Date(targetISO).getTime();
+      setInterval(() => {
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+
+        if (diff > 0) {
+          document.getElementById('cd-days').textContent = Math.floor(diff / (1000 * 60 * 60 * 24));
+          document.getElementById('cd-hours').textContent = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          document.getElementById('cd-mins').textContent = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          document.getElementById('cd-secs').textContent = Math.floor((diff % (1000 * 60)) / 1000);
+        }
+      }, 1000);
+    }
+
+    function kirimRSVP(e) {
+      e.preventDefault();
+      const nama = document.getElementById('rsvp-nama').value;
+      const status = document.getElementById('rsvp-status').value;
+      const jumlah = document.getElementById('rsvp-jumlah').value;
+      const pesan = document.getElementById('rsvp-pesan').value;
+      const noWA = DATA_UNDANGAN.no_whatsapp_rsvp || "6281234567890";
+      const text = `Halo, saya *${nama}*\nStatus: *${status}* (${jumlah} orang)\n\nUcapan:\n"${pesan}"`;
+      window.open(`https://wa.me/${noWA}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+  </script>
+</body>
+</html>
